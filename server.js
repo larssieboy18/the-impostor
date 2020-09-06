@@ -21,7 +21,7 @@ client.on("ready", async () => {
   guild = await client.guilds.fetch(config.guildid);
 
   // give new members the guest role
-  (await guild.members.fetch()).filter(member => !member.user.bot && !member.roles.cache.get(config.guestroleid)).forEach(member => member.roles.add(config.guestroleid))
+  if (config.guestroleid) (await guild.members.fetch()).filter(member => !member.user.bot && !member.roles.cache.get(config.guestroleid)).forEach(member => member.roles.add(config.guestroleid))
 
   // find the host panel message, or create one
   let hostchannel = guild.channels.resolve(config.hostpanelchannelid);
@@ -105,6 +105,6 @@ client.on("messageReactionAdd", async (reaction, user) => {
   }
 })
 
-client
-  .on("guildMemberAdd", member => member.roles.add(config.guestroleid))
-  .login(config.token)
+if (config.guestroleid) client.on("guildMemberAdd", member => member.roles.add(config.guestroleid))
+
+client.login(config.token)
