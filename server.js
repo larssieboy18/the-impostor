@@ -21,7 +21,7 @@ client.on("ready", async () => {
   guild = await client.guilds.fetch(config.guildid);
 
   // give new members the guest role
-  if (config.guestroleid) (await guild.members.fetch()).filter(member => !member.user.bot && !member.roles.cache.get(config.guestroleid)).forEach(member => member.roles.add(config.guestroleid))
+  if (config.guestroleid) (await guild.members.fetch()).filter(member => !member.user.bot && !member.roles.resolve(config.guestroleid)).forEach(member => member.roles.add(config.guestroleid))
 
   // find the host panel message, or create one
   let hostchannel = guild.channels.resolve(config.hostpanelchannelid);
@@ -31,7 +31,7 @@ client.on("ready", async () => {
       title: "How to Host",
       description: [
         config.gameruleschannelid ? `*__Before starting on hosting your own game, make sure you've read <#${config.gameruleschannelid}>.__*` : null,
-        `1. Join the \`${guild.channels.get(config.newgamevcid).name}\`-voice channel to create your own voice channel.`,
+        `1. Join the \`${guild.channels.resolve(config.newgamevcid).name}\`-voice channel to create your own voice channel.`,
         "2. Get educated on the host actions below before starting your first game.",
         "3. Invite some friends to join you and give them the game code for the game."
       ].filter(s => s).join("\n"),
