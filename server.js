@@ -76,7 +76,7 @@ client.on("voiceStateUpdate", async (oldVoice, newVoice) => {
     await channel.updateOverwrite(guild.roles.everyone, { VIEW_CHANNEL: null })
     await channel.updateOverwrite(newVoice.member, { MUTE_MEMBERS: true, DEAFEN_MEMBERS: true })
   }
-  if (!oldVoice.channel.members.size && oldVoice.channel.parent.id == config.gamecategoryid && oldVoice.channelID !== config.newgamevcid) oldVoice.channel.delete();
+  if (oldVoice && !oldVoice.channel.members.size && oldVoice.channel.parent.id == config.gamecategoryid && oldVoice.channelID !== config.newgamevcid) oldVoice.channel.delete();
 })
 
 client.on("messageReactionAdd", async (reaction, user) => {
