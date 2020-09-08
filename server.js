@@ -48,7 +48,7 @@ client.on("ready", async () => {
       color: 0xE74C3C
     }
   })
-  await new Promise(resolve => hostchannel.send({
+  hostpanel = await hostchannel.send({
     embed: {
       title: "Host Actions",
       description: [
@@ -58,14 +58,10 @@ client.on("ready", async () => {
       ].join("\n"),
       color: 0xF1C40F
     }
-  }).then(async message => {
-    hostpanel = message;
-    resolve();
-    await message.reactions.removeAll();
-    await message.react("🔇");
-    await message.react("🔊");
-    await message.react("♻️");
-  }))
+  })
+  await hostpanel.react("🔊");
+  await hostpanel.react("♻️");
+  await hostpanel.react("🔇");
 })
 
 client.on("voiceStateUpdate", async (oldVoice, newVoice) => {
