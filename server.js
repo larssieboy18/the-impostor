@@ -30,11 +30,11 @@ client.on("ready", async () => {
     embed: {
       title: "How to Host",
       description: [
-        "*__Before starting on hosting your own game, make sure you've read the <#747106599369310248>.__*",
-        "1. Join the \"Create new game\"-voice channel to create your own voice channel.",
+        config.gameruleschannelid ? `*__Before starting on hosting your own game, make sure you've read <#${config.gameruleschannelid}>.__*` : null,
+        `1. Join the \`${guild.channels.get(config.newgamevcid).name}\`-voice channel to create your own voice channel.`,
         "2. Get educated on the host actions below before starting your first game.",
         "3. Invite some friends to join you and gve them the game code for the game."
-      ].join("\n"),
+      ].filter(s => s).join("\n"),
       color: 0x3498DB
     }
   })
