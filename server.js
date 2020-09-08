@@ -33,7 +33,7 @@ client.on("ready", async () => {
         config.gameruleschannelid ? `*__Before starting on hosting your own game, make sure you've read <#${config.gameruleschannelid}>.__*` : null,
         `1. Join the \`${guild.channels.get(config.newgamevcid).name}\`-voice channel to create your own voice channel.`,
         "2. Get educated on the host actions below before starting your first game.",
-        "3. Invite some friends to join you and gve them the game code for the game."
+        "3. Invite some friends to join you and give them the game code for the game."
       ].filter(s => s).join("\n"),
       color: 0x3498DB
     }
