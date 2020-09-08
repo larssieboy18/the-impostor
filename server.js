@@ -59,9 +59,9 @@ client.on("ready", async () => {
       color: 0xF1C40F
     }
   })
+  await hostpanel.react("🔇");
   await hostpanel.react("🔊");
   await hostpanel.react("♻️");
-  await hostpanel.react("🔇");
 })
 
 client.on("voiceStateUpdate", async (oldVoice, newVoice) => {
