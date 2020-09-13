@@ -1,5 +1,3 @@
-const config = require("../../config.json")
-
 // embeds for the host panel
 module.exports.panelEmbeds = [
   {

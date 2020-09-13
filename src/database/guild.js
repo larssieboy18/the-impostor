@@ -1,4 +1,4 @@
-const config = require("../../config.json"), mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 const dbCache = new Map(), dbSaveQueue = new Map();
 
