@@ -18,7 +18,7 @@ That's right. Literally anyone can host their own game with this bot. The bot ha
 
 The host have some tools available. They can easily mute and unmute everyone in the voice channel with a simple left-click on Discord. It's recommended for the host to either be an Alt+Tab-god, or to have two monitors.
 
-![The Host panel](https://i.promise.solutions/wCOvWB.png)
+![The Host panel](https://i.promise.solutions/64uEWd.png)
 
 ### No database or external packages required
 
