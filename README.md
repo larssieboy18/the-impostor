@@ -29,6 +29,7 @@ The code is made in discord.js (version 12), and some additional packages makes 
 - Node version 12 (confirmed working on v12.16.1)
 - npm (usually comes with Node, doesn't really matter what version afaik)
 - a Discord bot token, and having the bot in your server
+- an mlab.com-database set up, as well as a user to it (with write access)
 
 ### How to setup
 
@@ -36,12 +37,10 @@ You will have to do all of this ONCE.
 
 - Rename `config.example.json` to `config.json` and fill in the values.
   - `token`: Your Discord bot token
-  - `guildid`: The guild ID of your server
-  - `guestroleid` (optional): The role you want to give people people who join the server 
-  - `hostpanelchannelid`: The channel ID of where you want the host panel to be put
-  - `newgamevcid`: The voice channel ID of what channel people can join to create their own game
-  - `gamecategoryid`: The channel category ID of where the game voice channels will be created
-  - `gameruleschannelid` (optional): The channel where the custom unofficial game rules are, if you have a channel for that.
+  - `database_uri`: The mlab.com-user and password-URI
+  - `admins`: An array of admins, the first one being the owner (you)
+  - `prefix`: The default prefix of the bot
+  - `color`: The brand color in decimal number
 - Do `npm i` inside the folder, and wait for it to finish.
 
 After this is done, you can start the bot with `node .`

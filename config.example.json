@@ -1,6 +1,6 @@
 {
   "token": "discord token here",
-  "database_uri": "mongodb:// link here",
+  "database_uri": "mongodb:// URI here",
   "admins": [
     "your user id here"
   ],
