@@ -1,6 +1,13 @@
+[![DeepScan grade](https://deepscan.io/api/teams/5752/projects/13791/branches/242020/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=5752&pid=13791&bid=242020)
+[![Dependency Status](https://david-dm.org/biaw/the-impostor.svg)](https://david-dm.org/biaw/the-impostor)
+[![GitHub Issues](https://img.shields.io/github/issues-raw/biaw/the-impostor.svg)](https://github.com/biaw/the-impostor/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr-raw/biaw/the-impostor.svg)](https://github.com/biaw/the-impostor/pulls)
+[![License](https://img.shields.io/github/license/biaw/the-impostor.svg)](https://github.com/biaw/the-impostor/blob/master/LICENSE)
+[![Discord Support](https://img.shields.io/discord/449576301997588490.svg)](https://promise.solutions/support)
+
 # The Impostor BIAW
 
-A simple Discord.js-bot to help you host Among us-games.
+The Impostor is a simple bot that helps you host Among us-games through Discord voice chat. With a simple setup, your hosting panel is ready.
 
 ## Features
 
@@ -39,10 +46,18 @@ You will have to do all of this ONCE.
 
 After this is done, you can start the bot with `node .`
 
+## Suggestions, bugs, feature requests
+
+Want to contribute? Great, we love that! Please take your time on [opening a new issue](https://github.com/biaw/the-impostor/issues/new).
+
+## Contributors
+
+You can see all contributors and their GitHub-profiles [here](https://github.com/biaw/the-impostor/graphs/contributors).
+
 ## License
 
 We use the MIT-license.
 
 > A short, permissive software license. Basically, you can do whatever you want as long as you include the original copyright and license notice in any copy of the software/source. There are many variations of this license in use.
 
-Fetched from [TLDRLegal](https://tldrlegal.com/license/mit-license), please also read the [license](https://github.com/gleeny/24-7/blob/master/LICENSE) if you plan on using the source code. This is only a short summary. Please also take note of that we are not forced to help you, and we won't help you host it yourself as we do not recommend you doing so.
+Fetched from [TLDRLegal](https://tldrlegal.com/license/mit-license), please also read the [license](https://github.com/biaw/the-impostor/blob/master/LICENSE) if you plan on using the source code. This is only a short summary.

@@ -1,10 +1,9 @@
 {
-  "token": "",
-
-  "guildid": "",
-  "guestroleid": "",
-  "hostpanelchannelid": "",
-  "newgamevcid": "",
-  "gamecategoryid": "",
-  "gameruleschannelid": ""
+  "token": "discord token here",
+  "database_uri": "mongodb:// link here",
+  "admins": [
+    "your user id here"
+  ],
+  "prefix": "im!",
+  "color": 16768554
 }
