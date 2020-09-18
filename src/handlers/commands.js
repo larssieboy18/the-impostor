@@ -19,9 +19,6 @@ module.exports = async (message, gdb, db, prefix) => {
   content = content.join(" ");
   
   if (!commands.has(commandName)) return; // this is not a command
-  
-  if (message.partial && !message.member) message = await message.fetch();
-  if (message.member.partial) message.member = await message.member.fetch(); 
 
   const commandFile = commands.get(commandName), permissionLevel = getPermissionLevel(message.member);
 
