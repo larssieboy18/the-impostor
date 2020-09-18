@@ -29,7 +29,10 @@ module.exports.configure = (client, db) => { // on startup
     const gdb = await db.guild(reaction.message.guild.id), { category } = gdb.get(), actionsMessage = actionPanels.get(reaction.message.guild.id);
 
     if (reaction.message.id == actionsMessage) {
-      let vc = reaction.message.guild.members.resolve(user).voice.channel;
+      let member = reaction.message.guild.members.resolve(user);
+      if (!member) return reaction.users.remove(user); // the user is not cached. if a user is in a VC, they automatically get cached, so we know they're not in a game VC.
+
+      let vc = member.voice.channel;
       if (!vc || !vc.parent || vc.parent.id !== category || !vc.permissionsFor(user).has("MUTE_MEMBERS")) return reaction.users.remove(user); // they're not in a game VC, or they don't have host perms in the game VC, so we cancel
 
       if (reaction.emoji.name == "🔇") {
