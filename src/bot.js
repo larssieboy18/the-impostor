@@ -25,7 +25,7 @@ let shard = "Shard N/A:", disabledGuilds = null;
 
 hostingHandler.configure(client, db)
 
-client.on("shardReady", async (shardid, unavailable = new Set()) => {
+client.once("shardReady", async (shardid, unavailable = new Set()) => {
   shard = `Shard ${shardid}:`;
   console.log(shard, `Ready as ${client.user.tag}!`);
 
