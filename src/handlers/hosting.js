@@ -29,6 +29,22 @@ module.exports.configure = (client, db) => { // on startup
       oldVoice.channel.parent.id == category
     ) oldVoice.channel.delete();
 
+    // when joining a room, mute/deafen them if needed
+    if (
+      newVoice.channel &&
+      newVoice.channel.parent.id == category &&
+      !(
+        oldVoice.channel &&
+        newVoice.channel.id == oldVoice.channel.id
+      )
+    ) {
+      let gameState = gameStates.get(newVoice.channel.id);
+      if (!gameState) gameState = await guessGameState(newVoice.channel);
+
+      if ((gameState == "game-over" || gameState == "in-game") && (newVoice.serverMute || newVoice.serverDeaf)) newVoice.member.edit({ mute: false, deaf: false })
+      else if (gameState == "discussion" && (!newVoice.serverMute || newVoice.serverDeaf)) newVoice.member.edit({ mute: true, deaf: false })
+    }
+
     // when leaving a room, unmute/undeafen them if needed
     if (
       oldVoice.channel &&
