@@ -9,6 +9,7 @@ module.exports.configure = (client, db) => { // on startup
     // unmute/undeafen queued users
     if (newVoice.channel && voiceResets.delete(`${oldVoice.guild.id}-${oldVoice.member.id}`)) newVoice.member.edit({ mute: false, deaf: false })
 
+    // create new rooms
     if (newVoice.channelID == newGameVoiceChannel) {
       let channel = await newVoice.guild.channels.create(`${newVoice.member.displayName}'s Game`, {
         type: "voice",
@@ -19,12 +20,14 @@ module.exports.configure = (client, db) => { // on startup
       await newVoice.member.edit({ channel })
       await channel.updateOverwrite(newVoice.member, { MUTE_MEMBERS: true, DEAFEN_MEMBERS: true })
     }
+
+    // delete empty rooms
     if (
       oldVoice.channel &&
       !oldVoice.channel.members.size &&
       oldVoice.channelID !== newGameVoiceChannel &&
       oldVoice.channel.parent.id == category
-    ) oldVoice.channel.delete(); // delete empty rooms
+    ) oldVoice.channel.delete();
 
     // when leaving a room, unmute/undeafen them if needed
     if (
