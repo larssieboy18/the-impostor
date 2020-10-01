@@ -1,10 +1,14 @@
-const actionPanels = new Map(), gameStates = new Map(); // guild ID: action panel message ID
+const actionPanels = new Map(), gameStates = new Map(), voiceResets = new Set(); // guild ID: action panel message ID
 
 const { panelEmbeds } = require("../constants/index.js")
 
 module.exports.configure = (client, db) => { // on startup
   client.on("voiceStateUpdate", async (oldVoice, newVoice) => {
     const gdb = await db.guild(newVoice.guild.id), { newGameVoiceChannel, category } = gdb.get();
+
+    // unmute/undeafen queued users
+    if (newVoice.channel && voiceResets.delete(`${oldVoice.guild.id}-${oldVoice.member.id}`)) newVoice.member.edit({ mute: false, deaf: false })
+
     if (newVoice.channelID == newGameVoiceChannel) {
       let channel = await newVoice.guild.channels.create(`${newVoice.member.displayName}'s Game`, {
         type: "voice",
@@ -21,6 +25,23 @@ module.exports.configure = (client, db) => { // on startup
       oldVoice.channelID !== newGameVoiceChannel &&
       oldVoice.channel.parent.id == category
     ) oldVoice.channel.delete(); // delete empty rooms
+
+    // when leaving a room, unmute/undeafen them if needed
+    if (
+      oldVoice.channel &&
+      oldVoice.channel.parent.id == category &&
+      !(
+        newVoice.channel &&
+        oldVoice.channel.id == newVoice.channel.id
+      ) &&
+      (
+        newVoice.serverMute ||
+        newVoice.serverDeaf
+      )
+    ) {
+      if (newVoice.channel) newVoice.member.edit({ mute: false, deaf: false });
+      else voiceResets.add(`${oldVoice.guild.id}-${oldVoice.member.id}`); // we can only unmute and undeafen them if they're in a voice channel. we rather need to queue for it to happen.
+    }
   })
 
   client.on("messageReactionAdd", async (reaction, user) => {
