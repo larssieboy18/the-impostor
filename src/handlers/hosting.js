@@ -17,6 +17,7 @@ module.exports.configure = (client, db) => { // on startup
         parent: category,
         permissionOverwrites: []
       });
+      gameStates.set(channel.id, "game-over")
       await newVoice.member.edit({ channel })
       await channel.updateOverwrite(newVoice.member, { MUTE_MEMBERS: true, DEAFEN_MEMBERS: true })
     }
