@@ -92,4 +92,6 @@ module.exports.refreshPanel = async hChannel => {
   }
 }
 
+module.exports.gameStates = gameStates;
+
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms)) // avoids rate limiting
