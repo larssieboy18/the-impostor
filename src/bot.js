@@ -38,7 +38,7 @@ client.once("shardReady", async (shardid, unavailable = new Set()) => {
 
   // update presence
   updatePresence();
-  client.setInterval(updatePresence, 60000)
+  client.setInterval(updatePresence, 15000)
 })
 
 function updatePresence() {
@@ -46,7 +46,7 @@ function updatePresence() {
     status: "online",
     activity: {
       type: "WATCHING",
-      name: `the cameras • ${config.prefix}help`
+      name: `${Array.from(hostingHandler.gameStates.values()).length} games • ${config.prefix}help`
     }
   })
 }
