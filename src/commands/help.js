@@ -1,8 +1,12 @@
 module.exports = {
-  description: "Get the latency of the bot.",
-  usage: {},
-  examples: {},
-  aliases: [ "pong", "latency", "uptime" ],
+  description: "Get help on how to use the bot.",
+  usage: {
+    "[search ...]": "Something you want to search for, for example a command."
+  },
+  examples: {
+    "help": "Get help on the command help. Oh wait, you already did."
+  },
+  aliases: [ "commands" ],
   permissionRequired: 0, // 0 All, 1 Mods, 2 Admins, 3 Server Owner, 4 Bot Admin, 5 Bot Owner
   checkArgs: (args) => args.length <= 1
 }

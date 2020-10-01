@@ -1,7 +1,11 @@
 module.exports = {
-  description: "Set the prefix of the bot. Leave blank to reset.",
-  usage: {},
-  examples: {},
+  description: "Set the prefix of the bot.",
+  usage: {
+    "[prefix ...]": "The new prefix you'd like to use. Leave blank to reset."
+  },
+  examples: {
+    "im?": "Set the prefix to \`im?\`."
+  },
   aliases: [ "setprefix" ],
   permissionRequired: 2, // 0 All, 1 Mods, 2 Admins, 3 Server Owner, 4 Bot Admin, 5 Bot Owner
   checkArgs: (args) => true
