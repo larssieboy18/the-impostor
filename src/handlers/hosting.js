@@ -61,16 +61,7 @@ module.exports.configure = (client, db) => { // on startup
 
       if (reaction.emoji.name == "🔘") {
         let gameState = gameStates.get(vc.id);
-        if (!gameState) { // try and find out what the game state is. this is most commonly used when the bot restarts and has no idea whether it's mid-game or not.
-          await vc.fetch();
-          let voiceStates = vc.members.map(member => {
-            if (member.voice.serverMute) return "mute";
-            if (member.voice.serverDeaf) return "deaf";
-            return null;
-          }).sort(s => s), mostCommon = voiceStates.sort((a, b) => voiceStates.filter(s => s == a).length - voiceStates.filter(s => s == b).length).pop();
-          if (mostCommon == "deaf") gameState = "in-game";
-          else gameState = "discussion";
-        }
+        if (!gameState) gameState = await guessGameState(vc);
 
         if (gameState == "in-game") { // we want to mute the dead ones and undeafen the alive ones
           gameStates.set(vc.id, "discussion")
@@ -92,6 +83,18 @@ module.exports.configure = (client, db) => { // on startup
   })
 
   client.on("channelDelete", channel => gameStates.delete(channel.id))
+}
+
+async function guessGameState(vc) { // try and find out what the game state is. this is most commonly used when the bot restarts and has no idea whether it's mid-game or not.
+  await vc.fetch();
+  let voiceStates = vc.members.map(member => {
+    if (member.voice.serverMute) return "mute";
+    if (member.voice.serverDeaf) return "deaf";
+    return null;
+  }).sort(s => s), mostCommon = voiceStates.sort((a, b) => voiceStates.filter(s => s == a).length - voiceStates.filter(s => s == b).length).pop();
+  if (mostCommon == "deaf") return "in-game";
+  if (mostCommon == "mute") return "discussion";
+  return "game-over";
 }
 
 module.exports.refreshPanel = async hChannel => {
