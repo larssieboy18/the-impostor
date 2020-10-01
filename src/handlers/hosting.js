@@ -1,10 +1,15 @@
-const actionPanels = new Map(), gameStates = new Map(); // guild ID: action panel message ID
+const actionPanels = new Map(), gameStates = new Map(), voiceResets = new Set(); // guild ID: action panel message ID
 
 const { panelEmbeds } = require("../constants/index.js")
 
 module.exports.configure = (client, db) => { // on startup
   client.on("voiceStateUpdate", async (oldVoice, newVoice) => {
     const gdb = await db.guild(newVoice.guild.id), { newGameVoiceChannel, category } = gdb.get();
+
+    // unmute/undeafen queued users
+    if (newVoice.channel && voiceResets.delete(`${oldVoice.guild.id}-${oldVoice.member.id}`)) newVoice.member.edit({ mute: false, deaf: false })
+
+    // create new rooms
     if (newVoice.channelID == newGameVoiceChannel) {
       let channel = await newVoice.guild.channels.create(`${newVoice.member.displayName}'s Game`, {
         type: "voice",
@@ -12,15 +17,51 @@ module.exports.configure = (client, db) => { // on startup
         parent: category,
         permissionOverwrites: []
       });
+      gameStates.set(channel.id, "game-over")
       await newVoice.member.edit({ channel })
       await channel.updateOverwrite(newVoice.member, { MUTE_MEMBERS: true, DEAFEN_MEMBERS: true })
     }
+
+    // delete empty rooms
     if (
       oldVoice.channel &&
       !oldVoice.channel.members.size &&
       oldVoice.channelID !== newGameVoiceChannel &&
       oldVoice.channel.parent.id == category
-    ) oldVoice.channel.delete(); // delete empty rooms
+    ) oldVoice.channel.delete();
+
+    // when joining a room, mute/deafen them if needed
+    if (
+      newVoice.channel &&
+      newVoice.channel.parent.id == category &&
+      !(
+        oldVoice.channel &&
+        newVoice.channel.id == oldVoice.channel.id
+      )
+    ) {
+      let gameState = gameStates.get(newVoice.channel.id);
+      if (!gameState) gameState = await guessGameState(newVoice.channel);
+
+      if ((gameState == "game-over" || gameState == "in-game") && (newVoice.serverMute || newVoice.serverDeaf)) newVoice.member.edit({ mute: false, deaf: false })
+      else if (gameState == "discussion" && (!newVoice.serverMute || newVoice.serverDeaf)) newVoice.member.edit({ mute: true, deaf: false })
+    }
+
+    // when leaving a room, unmute/undeafen them if needed
+    if (
+      oldVoice.channel &&
+      oldVoice.channel.parent.id == category &&
+      !(
+        newVoice.channel &&
+        oldVoice.channel.id == newVoice.channel.id
+      ) &&
+      (
+        newVoice.serverMute ||
+        newVoice.serverDeaf
+      )
+    ) {
+      if (newVoice.channel) newVoice.member.edit({ mute: false, deaf: false });
+      else voiceResets.add(`${oldVoice.guild.id}-${oldVoice.member.id}`); // we can only unmute and undeafen them if they're in a voice channel. we rather need to queue for it to happen.
+    }
   })
 
   client.on("messageReactionAdd", async (reaction, user) => {
@@ -37,16 +78,7 @@ module.exports.configure = (client, db) => { // on startup
 
       if (reaction.emoji.name == "🔘") {
         let gameState = gameStates.get(vc.id);
-        if (!gameState) { // try and find out what the game state is. this is most commonly used when the bot restarts and has no idea whether it's mid-game or not.
-          await vc.fetch();
-          let voiceStates = vc.members.map(member => {
-            if (member.voice.serverMute) return "mute";
-            if (member.voice.serverDeaf) return "deaf";
-            return null;
-          }).sort(s => s), mostCommon = voiceStates.sort((a, b) => voiceStates.filter(s => s == a).length - voiceStates.filter(s => s == b).length).pop();
-          if (mostCommon == "deaf") gameState = "in-game";
-          else gameState = "discussion";
-        }
+        if (!gameState) gameState = await guessGameState(vc);
 
         if (gameState == "in-game") { // we want to mute the dead ones and undeafen the alive ones
           gameStates.set(vc.id, "discussion")
@@ -68,6 +100,18 @@ module.exports.configure = (client, db) => { // on startup
   })
 
   client.on("channelDelete", channel => gameStates.delete(channel.id))
+}
+
+async function guessGameState(vc) { // try and find out what the game state is. this is most commonly used when the bot restarts and has no idea whether it's mid-game or not.
+  await vc.fetch();
+  let voiceStates = vc.members.map(member => {
+    if (member.voice.serverMute) return "mute";
+    if (member.voice.serverDeaf) return "deaf";
+    return null;
+  }).sort(s => s), mostCommon = voiceStates.sort((a, b) => voiceStates.filter(s => s == a).length - voiceStates.filter(s => s == b).length).pop();
+  if (mostCommon == "deaf") return "in-game";
+  if (mostCommon == "mute") return "discussion";
+  return "game-over";
 }
 
 module.exports.refreshPanel = async hChannel => {
