@@ -20,8 +20,7 @@ module.exports.panelEmbeds = [
   {
     title: "Host Actions",
     description: [
-      "🔇 **IN-GAME:** Crewmates are deafened, and ghosts can talk to each other.",
-      "🔊 **DISCUSSION:** Crewmates are undeafened, and ghosts are muted.",
+      "🔘 **SWITCH:** Switch between in-game and discussion.",
       "♻️ **GAME-OVER:** Unmute and undeafen everyone."
     ].join("\n"),
     color: 0xF1C40F
