@@ -34,7 +34,7 @@ module.exports.configure = (client, db) => { // on startup
     // when joining a room, mute/deafen them if needed
     if (
       newVoice.channel &&
-      oldVoice.channel.parent &&
+      newVoice.channel.parent &&
       newVoice.channel.parent.id == category &&
       !(
         oldVoice.channel &&
