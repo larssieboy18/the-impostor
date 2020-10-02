@@ -27,16 +27,18 @@ module.exports.configure = (client, db) => { // on startup
       oldVoice.channel &&
       !oldVoice.channel.members.size &&
       oldVoice.channelID !== newGameVoiceChannel &&
+      oldVoice.channel.parent &&
       oldVoice.channel.parent.id == category
     ) oldVoice.channel.delete();
 
     // when joining a room, mute/deafen them if needed
     if (
       newVoice.channel &&
+      oldVoice.channel.parent &&
       newVoice.channel.parent.id == category &&
       !(
         oldVoice.channel &&
-        newVoice.channel.id == oldVoice.channel.id
+        newVoice.channelID == oldVoice.channelID
       )
     ) {
       let gameState = gameStates.get(newVoice.channel.id);
@@ -49,17 +51,18 @@ module.exports.configure = (client, db) => { // on startup
     // when leaving a room, unmute/undeafen them if needed
     if (
       oldVoice.channel &&
+      oldVoice.channel.parent &&
       oldVoice.channel.parent.id == category &&
       !(
         newVoice.channel &&
-        oldVoice.channel.id == newVoice.channel.id
+        oldVoice.channelID == newVoice.channelID
       ) &&
       (
         newVoice.serverMute ||
         newVoice.serverDeaf
       )
     ) {
-      if (newVoice.channel) newVoice.member.edit({ mute: false, deaf: false });
+      if (newVoice.channelID) newVoice.member.edit({ mute: false, deaf: false });
       else voiceResets.add(`${oldVoice.guild.id}-${oldVoice.member.id}`); // we can only unmute and undeafen them if they're in a voice channel. we rather need to queue for it to happen.
     }
   })
