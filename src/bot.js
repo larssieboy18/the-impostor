@@ -42,11 +42,12 @@ client.once("shardReady", async (shardid, unavailable = new Set()) => {
 })
 
 function updatePresence() {
+  const n = Array.from(hostingHandler.gameStates.values()).length;
   return client.user.setPresence({
     status: "online",
     activity: {
       type: "WATCHING",
-      name: `${Array.from(hostingHandler.gameStates.values()).length} games • ${config.prefix}help`
+      name: `${n == 0 ? 'the cameras' : `${n} game${n > 1 ? 's' : ''}`} • ${config.prefix}help`
     }
   })
 }
