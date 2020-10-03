@@ -47,7 +47,7 @@ function updatePresence() {
     status: "online",
     activity: {
       type: "WATCHING",
-      name: `${n == 0 ? 'the Cameras' : n + ' games'} • ${config.prefix}help`
+      name: `${n == 0 ? 'the Cameras' : n + ` game${ n > 1 ? 's' : ''}`} • ${config.prefix}help`
     }
   })
 }
