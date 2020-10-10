@@ -1,7 +1,7 @@
 const { getPermissionLevel } = require("../constants/index.js"), fs = require("fs");
 
 // loading commands
-const commands = new Map(), aliases = new Map();
+const commands = new Map(), aliases = new Map(), statics = require("../commands/_static.json");
 fs.readdir("./src/commands/", (err, files) => {
   if (err) return console.log(err);
   for (const file of files) if (file.endsWith(".js")) {
@@ -17,6 +17,9 @@ module.exports = async (message, gdb, db, prefix) => {
   else content = message.content.slice(prefix.length).split(" ")
   const commandOrAlias = content.shift().toLowerCase(), commandName = aliases.get(commandOrAlias) || commandOrAlias;
   content = content.join(" ");
+
+  const static = statics.find(s => s.triggers.includes(commandName));
+  if (static) return message.channel.send(static.message);
   
   if (!commands.has(commandName)) return; // this is not a command
 

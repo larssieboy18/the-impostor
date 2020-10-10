@@ -1,0 +1,14 @@
+[
+  {
+    "triggers": [ "invite", "inviteme", "addme" ],
+    "message": "🔗 Invite me: <https://discordapp.com/api/oauth2/authorize?client_id={{BOT_ID}}&permissions=805432400&scope=bot>"
+  },
+  {
+    "triggers": [ "support" ],
+    "message": "🔗 Support server: <https://promise.solutions/support>"
+  },
+  {
+    "triggers": [ "source", "sourcecode", "code", "git" ],
+    "message": "🔗 Source code: https://github.com/biaw/the-impostor"
+  }
+]
