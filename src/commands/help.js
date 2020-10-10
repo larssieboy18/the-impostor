@@ -82,7 +82,15 @@ module.exports.run = async (message, args, gdb, { prefix, permissionLevel, conte
 }
 
 // loading commands
-const commands = []
+let commands = []
+for (const static of require("./_static.json")) commands.push({
+  description: "Static command.",
+  usage: {},
+  examples: {},
+  aliases: static.triggers.slice(1), // all except the first trigger
+  permissionRequired: 0,
+  command: static.triggers[0] // the first trigger
+})
 fs.readdir("./src/commands/", (err, files) => {
   if (err) return console.log(err);
   for (const file of files) if (file.endsWith(".js")) {
@@ -90,4 +98,6 @@ fs.readdir("./src/commands/", (err, files) => {
     commandFile.command = fileName;
     commands.push(commandFile);
   }
+  // sort the commands list by name once all commands have been loaded in
+  commands = commands.sort((a, b) => a.command.localeCompare(b.command))
 })
