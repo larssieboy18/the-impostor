@@ -7,6 +7,8 @@ const
   hostingHandler = require("./handlers/hosting.js"),
   client = new Discord.Client({
     disableMentions: "everyone",
+    messageCacheLifetime: 30,
+    messageSweepInterval: 300,
     partials: [ "USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION" ],
     presence: {
       status: "idle",
