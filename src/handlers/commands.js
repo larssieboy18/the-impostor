@@ -19,7 +19,7 @@ module.exports = async (message, gdb, db, prefix) => {
   content = content.join(" ");
 
   const static = statics.find(s => s.triggers.includes(commandName));
-  if (static) return message.channel.send(static.message);
+  if (static) return message.channel.send(static.message.replace(/{{BOT_ID}}/, message.client.user.id));
   
   if (!commands.has(commandName)) return; // this is not a command
 
