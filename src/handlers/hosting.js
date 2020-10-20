@@ -117,17 +117,27 @@ async function guessGameState(vc) { // try and find out what the game state is. 
   return "game-over";
 }
 
-module.exports.refreshPanel = async hChannel => {
+module.exports.refreshPanel = async (hChannel, force = false) => {
   try {
-    let messages = await hChannel.messages.fetch({ limit: 50 });
+    let messages = await hChannel.messages.fetch({ limit: 50 }), panels = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp), lastPanel = panels.last();
+    
+    if (
+      !force &&
+      !messages.find(m => m.author.id !== hChannel.client.user.id) && // check if all the messages are owned by the bot itself
+      messages.size == panelEmbeds.length
+    ) { // we try and use the existing panel instead of recreating it
+      let changelogEmbed = panelEmbeds.find(e => e.title.includes("Changelog")), changelogIndex = panelEmbeds.indexOf(changelogEmbed);
+      Array.from(messages.values())[changelogIndex].edit({ embed: changelogEmbed });
+      return actionPanels.set(hChannel.guild.id, lastPanel.id);
+    }
+
     while (messages.size == 50) {
       await hChannel.bulkDelete(messages);
       messages = await hChannel.messages.fetch({ limit: 50 });
       await pause(1000);
     }
     hChannel.bulkDelete(messages);
-
-    let lastPanel;
+    
     for (const embed of panelEmbeds) lastPanel = await hChannel.send({ embed });
     actionPanels.set(hChannel.guild.id, lastPanel.id)
     await lastPanel.react("🔘");

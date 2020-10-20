@@ -14,7 +14,7 @@ const
       status: "idle",
       activity: {
         type: "WATCHING",
-        name: "the loading screen"
+        name: "the loading screen (0%)"
       }
     },
     ws: {
@@ -33,8 +33,18 @@ client.once("shardReady", async (shardid, unavailable = new Set()) => {
 
   // process guilds
   disabledGuilds = new Set([...Array.from(unavailable), ...client.guilds.cache.map(guild => guild.id)]);
-  let startTimestamp = Date.now();
-  await Promise.all(client.guilds.cache.map(processGuild));
+  let startTimestamp = Date.now(), completed = 0, presenceInterval = setInterval(() => client.user.setPresence({
+    status: "idle",
+    activity: {
+      type: "WATCHING",
+      name: `the loading screen (${Math.round((completed / client.guilds.cache.size) * 100)}%)`
+    }
+  }), 1000)
+  for (const guild of Array.from(client.guilds.cache.values())) {
+    await processGuild(guild);
+    completed++;
+  }
+  clearInterval(presenceInterval)
   console.log(shard, `All ${client.guilds.cache.size} available guilds have been processed and is now ready! [${Date.now() - startTimestamp}ms]`)
   disabledGuilds = false
 
