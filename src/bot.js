@@ -41,6 +41,7 @@ client.once("shardReady", async (shardid, unavailable = new Set()) => {
   }), 1000)
   for (const guild of Array.from(client.guilds.cache.values())) {
     await processGuild(guild);
+    disabledGuilds.delete(guild.id);
     completed++;
   }
   clearInterval(presenceInterval)
