@@ -68,7 +68,10 @@ client.on("message", async message => {
   if (
     !message.guild || // dms
     disabledGuilds == null ||
-    (disabledGuilds && disabledGuilds.has && disabledGuilds.has(message.guild.id))
+    (
+      disabledGuilds &&
+      disabledGuilds.has(message.guild.id)
+    )
   ) return;
 
   const gdb = await db.guild(message.guild.id);
