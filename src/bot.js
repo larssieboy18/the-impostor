@@ -71,7 +71,8 @@ client.on("message", async message => {
     (
       disabledGuilds &&
       disabledGuilds.has(message.guild.id)
-    )
+    ) ||
+    message.author.bot
   ) return;
 
   const gdb = await db.guild(message.guild.id);
