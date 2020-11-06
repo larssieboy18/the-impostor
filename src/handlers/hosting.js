@@ -1,5 +1,6 @@
 const actionPanels = new Map(), gameStates = new Map(), voiceResets = new Set(); // guild ID: action panel message ID
 
+const { panelEmbeds } = require("../constants/index.js");
 
 module.exports.configure = (client, db) => { // on startup
   client.on("voiceStateUpdate", async (oldVoice, newVoice) => {
