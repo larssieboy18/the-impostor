@@ -88,7 +88,7 @@ async function processGuild(guild) {
 
   // check the hosting panel
   const hChannel = guild.channels.resolve(hostingChannel);
-  if (hChannel && hChannel.viewable) await hostingHandler.refreshPanel(hChannel);
+  if (hChannel && hChannel.viewable) await hostingHandler.refreshPanel(hChannel, gdb, guild);
 }
 
 client

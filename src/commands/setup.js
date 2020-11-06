@@ -7,7 +7,7 @@ module.exports = {
   checkArgs: (args) => !args.length
 }
 
-const { refreshPanel: configurePanel } = require("../handlers/hosting.js");
+const { recreatePanel } = require("../handlers/hosting.js");
 
 module.exports.run = async (message, args, gdb) => {
   const { hostingChannel, newGameVoiceChannel, category } = gdb.get();
@@ -49,20 +49,8 @@ module.exports.run = async (message, args, gdb) => {
   })
 
   // create hosting panel
-  const hChannel = await message.guild.channels.create("hosting", {
-    parent: cChannel,
-    permissionOverwrites: [
-      ...basePermissions,
-      {
-        id: message.guild.roles.everyone,
-        deny: [
-          "SEND_MESSAGES",
-          "ADD_REACTIONS"
-        ]
-      }
-    ]
-  })
-  configurePanel(hChannel);
+  const hChannel = await recreatePanel(gdb, message.guild, cChannel);
+  if (!hChannel) return message.channel.send("❌ Something went wrong when creating the hosting channel.");
 
   // create new game VC
   const nVoiceChannel = await message.guild.channels.create("➕ Create new game", {

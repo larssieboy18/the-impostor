@@ -118,35 +118,62 @@ async function guessGameState(vc) { // try and find out what the game state is. 
 }
 
 module.exports.refreshPanel = async (hChannel, force = false) => {
+module.exports.refreshPanel = async (hChannel, gdb, guild) => {
   try {
     let messages = await hChannel.messages.fetch({ limit: 50 }), panels = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp), lastPanel = panels.last();
     
     if (
-      !force &&
       !messages.find(m => m.author.id !== hChannel.client.user.id) && // check if all the messages are owned by the bot itself
       messages.size == panelEmbeds.length
     ) { // we try and use the existing panel instead of recreating it
       let changelogEmbed = panelEmbeds.find(e => e.title.includes("Changelog")), changelogIndex = panelEmbeds.indexOf(changelogEmbed);
       Array.from(messages.values())[changelogIndex].edit({ embed: changelogEmbed });
       return actionPanels.set(hChannel.guild.id, lastPanel.id);
+    } else {
+      hChannel.delete();
+      return await this.recreatePanel(gdb, guild);
     }
-
-    while (messages.size == 50) {
-      await hChannel.bulkDelete(messages);
-      messages = await hChannel.messages.fetch({ limit: 50 });
-      await pause(1000);
-    }
-    hChannel.bulkDelete(messages);
-    
-    for (const embed of panelEmbeds) lastPanel = await hChannel.send({ embed });
-    actionPanels.set(hChannel.guild.id, lastPanel.id)
-    await lastPanel.react("🔘");
-    await pause(1000);
-    await lastPanel.react("♻️");
-    return true; // done!
   } catch(e) {
     return false; // something went wrong ;-;, maybe it's missing permission?
   }
+}
+
+module.exports.recreatePanel = async (gdb, guild, parent = gdb.get().category) => {
+  let newChannel = await guild.channels.create("hosting", {
+    parent,
+    permissionOverwrites: [
+      {
+        id: guild.client.user.id,
+        allow: [
+          "VIEW_CHANNEL",
+          "SEND_MESSAGES",
+          "MANAGE_MESSAGES",
+          "ADD_REACTIONS",
+          "MANAGE_CHANNELS",
+          "MUTE_MEMBERS",
+          "DEAFEN_MEMBERS",
+          "MOVE_MEMBERS"
+        ]
+      },
+      {
+        id: guild.roles.everyone,
+        deny: [
+          "SEND_MESSAGES",
+          "ADD_REACTIONS"
+        ]
+      }
+    ]
+  });
+
+  gdb.set("hostingChannel", newChannel.id);
+
+  let lastPanel;
+  for (const embed of panelEmbeds) lastPanel = await newChannel.send({ embed });
+  actionPanels.set(newChannel.guild.id, lastPanel.id)
+  await lastPanel.react("🔘");
+  await pause(1000);
+  await lastPanel.react("♻️");
+  return newChannel; // done!
 }
 
 module.exports.gameStates = gameStates;
