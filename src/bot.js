@@ -39,11 +39,11 @@ client.once("shardReady", async (shardid, unavailable = new Set()) => {
       name: `the loading screen (${Math.round((completed / client.guilds.cache.size) * 100)}%)`
     }
   }), 1000);
-  await Promise.all(client.guilds.cache.map(async guild => {
+  for (const guild of Array.from(client.guilds.cache.values())) {
     await processGuild(guild);
     disabledGuilds.delete(guild.id);
     completed++;
-  }))
+  }
   clearInterval(presenceInterval);
   console.log(shard, `All ${client.guilds.cache.size} available guilds have been processed and is now ready! [${Date.now() - startTimestamp}ms]`);
   disabledGuilds = false;
