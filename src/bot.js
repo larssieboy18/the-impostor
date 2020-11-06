@@ -24,7 +24,7 @@ const
 
 let shard = "Shard N/A:", disabledGuilds = null;
 
-hostingHandler.configure(client, db)
+hostingHandler.configure(client, db);
 
 client.once("shardReady", async (shardid, unavailable = new Set()) => {
   shard = `Shard ${shardid}:`;
@@ -38,20 +38,20 @@ client.once("shardReady", async (shardid, unavailable = new Set()) => {
       type: "WATCHING",
       name: `the loading screen (${Math.round((completed / client.guilds.cache.size) * 100)}%)`
     }
-  }), 1000)
+  }), 1000);
   for (const guild of Array.from(client.guilds.cache.values())) {
     await processGuild(guild);
     disabledGuilds.delete(guild.id);
     completed++;
   }
-  clearInterval(presenceInterval)
-  console.log(shard, `All ${client.guilds.cache.size} available guilds have been processed and is now ready! [${Date.now() - startTimestamp}ms]`)
-  disabledGuilds = false
+  clearInterval(presenceInterval);
+  console.log(shard, `All ${client.guilds.cache.size} available guilds have been processed and is now ready! [${Date.now() - startTimestamp}ms]`);
+  disabledGuilds = false;
 
   // update presence
   updatePresence();
-  client.setInterval(updatePresence, 15000)
-})
+  client.setInterval(updatePresence, 15000);
+});
 
 function updatePresence() {
   const n = Array.from(hostingHandler.gameStates.values()).length;
@@ -59,9 +59,9 @@ function updatePresence() {
     status: "online",
     activity: {
       type: "WATCHING",
-      name: `${n == 0 ? 'the cameras' : `${n} game${n > 1 ? 's' : ''}`} • ${config.prefix}help`
+      name: `${n == 0 ? "the cameras" : `${n} game${n > 1 ? "s" : ""}`} • ${config.prefix}help`
     }
-  })
+  });
 }
 
 client.on("message", async message => {
@@ -80,8 +80,8 @@ client.on("message", async message => {
   if (!prefix) prefix = config.prefix;
 
   if (message.content.startsWith(prefix) || message.content.match(`^<@!?${client.user.id}> `)) return commandHandler(message, gdb, db, prefix);
-  else if (message.content.match(`^<@!?${client.user.id}>`)) return message.channel.send(`👋 My prefix is \`${prefix}\`, for help type \`${prefix}help\`.`)
-})
+  else if (message.content.match(`^<@!?${client.user.id}>`)) return message.channel.send(`👋 My prefix is \`${prefix}\`, for help type \`${prefix}help\`.`);
+});
 
 async function processGuild(guild) {
   const gdb = await db.guild(guild.id), { hostingChannel } = gdb.get();
@@ -99,6 +99,6 @@ client
   .on("shardReconnecting", () => console.log(shard, "Reconnecting."))
   .on("shardResume", (_, replayedEvents) => console.log(shard, `Resumed. ${replayedEvents} replayed events.`))
   .on("warn", info => console.log(shard, "Warning.", info))
-  .login(config.token)
+  .login(config.token);
 
 if (config.listKeys && Object.values(config.listKeys).length) BLAPI.handle(client, config.listKeys);

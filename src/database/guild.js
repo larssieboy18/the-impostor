@@ -19,23 +19,23 @@ const get = (guildid) => new Promise((resolve, reject) => Guild.findOne({ guildi
     guild = new Guild(Object.assign({}, guildObject));
     guild.guildid = guildid;
   }
-  return resolve(guild)
-}))
+  return resolve(guild);
+}));
 
-const load = (guildid) => new Promise(async (resolve, reject) => {
-  let guild = await get(guildid), guildCache = {}
+const load = async (guildid) => {
+  let guild = await get(guildid), guildCache = {};
   for (const key in guildObject) guildCache[key] = guild[key] || guildObject[key]; // if there's no value stored in the guild database then we use the default value
-  return resolve(dbCache.set(guildid, guildCache))
-});
+  return dbCache.set(guildid, guildCache);
+};
 
 const save = async (guildid, changes) => {
   if (!dbSaveQueue.has(guildid)) {
     dbSaveQueue.set(guildid, changes);
     let guild = await get(guildid), guildCache = dbCache.get(guildid), guildSaveQueue = dbSaveQueue.get(guildid);
     for (const key of guildSaveQueue) guild[key] = guildCache[key];
-    return guild.save().then(res => dbSaveQueue.delete(guildid)).catch(console.log)
-  } else dbSaveQueue.get(guildid).push(...changes)
-}
+    return guild.save().then(() => dbSaveQueue.delete(guildid)).catch(console.log);
+  } else dbSaveQueue.get(guildid).push(...changes);
+};
 
 module.exports = async guildid => {
   if (!dbCache.has(guildid)) await load(guildid); // if the guild is unloaded for some reason, we load it
@@ -49,19 +49,19 @@ module.exports = async guildid => {
     get: () => Object.assign({}, dbCache.get(guildid)),
     set: (key, value) => {
       dbCache.get(guildid)[key] = value;
-      save(guildid, [ key ])
+      save(guildid, [ key ]);
     },
     setMultiple: (changes) => {
       let guildCache = dbCache.get(guildid);
       for (const key in changes) guildCache[key] = changes[key];
 
-      save(guildid, Object.keys(changes))
+      save(guildid, Object.keys(changes));
     },
     reset: () => {
       let guildCache = dbCache.get(guildid);
       for (const key in guildObject) guildCache[key] = guildObject[key];
 
-      save(guildid, Object.keys(guildObject))
+      save(guildid, Object.keys(guildObject));
     }
-  }
-}
+  };
+};

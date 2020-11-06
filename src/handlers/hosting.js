@@ -1,13 +1,12 @@
 const actionPanels = new Map(), gameStates = new Map(), voiceResets = new Set(); // guild ID: action panel message ID
 
-const { panelEmbeds } = require("../constants/index.js")
 
 module.exports.configure = (client, db) => { // on startup
   client.on("voiceStateUpdate", async (oldVoice, newVoice) => {
     const gdb = await db.guild(newVoice.guild.id), { newGameVoiceChannel, category } = gdb.get();
 
     // unmute/undeafen queued users
-    if (newVoice.channel && voiceResets.delete(`${oldVoice.guild.id}-${oldVoice.member.id}`)) newVoice.member.edit({ mute: false, deaf: false })
+    if (newVoice.channel && voiceResets.delete(`${oldVoice.guild.id}-${oldVoice.member.id}`)) newVoice.member.edit({ mute: false, deaf: false });
 
     // create new rooms
     if (newVoice.channelID == newGameVoiceChannel) {
@@ -17,9 +16,9 @@ module.exports.configure = (client, db) => { // on startup
         parent: category,
         permissionOverwrites: []
       });
-      gameStates.set(channel.id, "game-over")
-      await newVoice.member.edit({ channel })
-      await channel.updateOverwrite(newVoice.member, { MUTE_MEMBERS: true, DEAFEN_MEMBERS: true })
+      gameStates.set(channel.id, "game-over");
+      await newVoice.member.edit({ channel });
+      await channel.updateOverwrite(newVoice.member, { MUTE_MEMBERS: true, DEAFEN_MEMBERS: true });
     }
 
     // delete empty rooms
@@ -44,8 +43,8 @@ module.exports.configure = (client, db) => { // on startup
       let gameState = gameStates.get(newVoice.channel.id);
       if (!gameState) gameState = await guessGameState(newVoice.channel);
 
-      if ((gameState == "game-over" || gameState == "in-game") && (newVoice.serverMute || newVoice.serverDeaf)) newVoice.member.edit({ mute: false, deaf: false })
-      else if (gameState == "discussion" && (!newVoice.serverMute || newVoice.serverDeaf)) newVoice.member.edit({ mute: true, deaf: false })
+      if ((gameState == "game-over" || gameState == "in-game") && (newVoice.serverMute || newVoice.serverDeaf)) newVoice.member.edit({ mute: false, deaf: false });
+      else if (gameState == "discussion" && (!newVoice.serverMute || newVoice.serverDeaf)) newVoice.member.edit({ mute: true, deaf: false });
     }
 
     // when leaving a room, unmute/undeafen them if needed
@@ -65,7 +64,7 @@ module.exports.configure = (client, db) => { // on startup
       if (newVoice.channelID) newVoice.member.edit({ mute: false, deaf: false });
       else voiceResets.add(`${oldVoice.guild.id}-${oldVoice.member.id}`); // we can only unmute and undeafen them if they're in a voice channel. we rather need to queue for it to happen.
     }
-  })
+  });
 
   client.on("messageReactionAdd", async (reaction, user) => {
     if (user.bot) return;
@@ -84,40 +83,39 @@ module.exports.configure = (client, db) => { // on startup
         if (!gameState) gameState = await guessGameState(vc);
 
         if (gameState == "in-game") { // we want to mute the dead ones and undeafen the alive ones
-          gameStates.set(vc.id, "discussion")
+          gameStates.set(vc.id, "discussion");
           let alive = vc.members.filter(member => member.voice.serverDeaf), dead = vc.members.filter(member => !member.voice.serverDeaf);
-          await Promise.all(dead.map(member => member.edit({ mute: true, deaf: false })))
-          await Promise.all(alive.map(member => member.edit({ mute: false, deaf: false })))
+          await Promise.all(dead.map(member => member.edit({ mute: true, deaf: false })));
+          await Promise.all(alive.map(member => member.edit({ mute: false, deaf: false })));
         } else { // discussion or game-over; we want to deafen the alive ones and unmute the dead ones
-          gameStates.set(vc.id, "in-game")
+          gameStates.set(vc.id, "in-game");
           let alive = vc.members.filter(member => !member.voice.serverMute), dead = vc.members.filter(member => member.voice.serverMute);
-          await Promise.all(alive.map(member => member.edit({ mute: false, deaf: true })))
-          await Promise.all(dead.map(member => member.edit({ mute: false, deaf: false })))
+          await Promise.all(alive.map(member => member.edit({ mute: false, deaf: true })));
+          await Promise.all(dead.map(member => member.edit({ mute: false, deaf: false })));
         }//🔰
       } else if (reaction.emoji.name == "♻️") {
-        gameStates.set(vc.id, "game-over")
-        await Promise.all(vc.members.filter(member => member.voice.serverMute || member.voice.serverDeaf).map(member => member.edit({ mute: false, deaf: false })))
+        gameStates.set(vc.id, "game-over");
+        await Promise.all(vc.members.filter(member => member.voice.serverMute || member.voice.serverDeaf).map(member => member.edit({ mute: false, deaf: false })));
       }
-      reaction.users.remove(user)
+      reaction.users.remove(user);
     }
-  })
+  });
 
-  client.on("channelDelete", channel => gameStates.delete(channel.id))
-}
+  client.on("channelDelete", channel => gameStates.delete(channel.id));
+};
 
 async function guessGameState(vc) { // try and find out what the game state is. this is most commonly used when the bot restarts and has no idea whether it's mid-game or not.
   await vc.fetch();
   let voiceStates = vc.members.map(member => {
-    if (member.voice.serverMute) return "mute";
-    if (member.voice.serverDeaf) return "deaf";
-    return null;
-  }).sort(s => s), mostCommon = voiceStates.sort((a, b) => voiceStates.filter(s => s == a).length - voiceStates.filter(s => s == b).length).pop();
+      if (member.voice.serverMute) return "mute";
+      if (member.voice.serverDeaf) return "deaf";
+      return null;
+    }).sort(s => s), mostCommon = voiceStates.sort((a, b) => voiceStates.filter(s => s == a).length - voiceStates.filter(s => s == b).length).pop();
   if (mostCommon == "deaf") return "in-game";
   if (mostCommon == "mute") return "discussion";
   return "game-over";
 }
 
-module.exports.refreshPanel = async (hChannel, force = false) => {
 module.exports.refreshPanel = async (hChannel, gdb, guild) => {
   try {
     let messages = await hChannel.messages.fetch({ limit: 50 }), panels = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp), lastPanel = panels.last();
@@ -136,7 +134,7 @@ module.exports.refreshPanel = async (hChannel, gdb, guild) => {
   } catch(e) {
     return false; // something went wrong ;-;, maybe it's missing permission?
   }
-}
+};
 
 module.exports.recreatePanel = async (gdb, guild, parent = gdb.get().category) => {
   let newChannel = await guild.channels.create("hosting", {
@@ -169,13 +167,13 @@ module.exports.recreatePanel = async (gdb, guild, parent = gdb.get().category) =
 
   let lastPanel;
   for (const embed of panelEmbeds) lastPanel = await newChannel.send({ embed });
-  actionPanels.set(newChannel.guild.id, lastPanel.id)
+  actionPanels.set(newChannel.guild.id, lastPanel.id);
   await lastPanel.react("🔘");
   await pause(1000);
   await lastPanel.react("♻️");
   return newChannel; // done!
-}
+};
 
 module.exports.gameStates = gameStates;
 
-const pause = ms => new Promise(resolve => setTimeout(resolve, ms)) // avoids rate limiting
+const pause = ms => new Promise(resolve => setTimeout(resolve, ms)); // avoids rate limiting

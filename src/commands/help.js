@@ -9,7 +9,7 @@ module.exports = {
   aliases: [ "commands" ],
   permissionRequired: 0, // 0 All, 1 Mods, 2 Admins, 3 Server Owner, 4 Bot Admin, 5 Bot Owner
   checkArgs: (args) => args.length <= 1
-}
+};
 
 const fs = require("fs"), config = require("../../config.json");
 
@@ -33,7 +33,7 @@ module.exports.run = async (message, args, gdb, { prefix, permissionLevel, conte
           name: "Available commands",
           value: commands.map(commandFile => {
             if (commandFile.permissionRequired >= 4) return null;
-            if (commandFile.permissionRequired > permissionLevel) return `~~*\`${commandFile.command}\`*~~`
+            if (commandFile.permissionRequired > permissionLevel) return `~~*\`${commandFile.command}\`*~~`;
             return `\`${commandFile.command}\``;
           }).filter(c => c).join(", "),
           inline: true
@@ -43,8 +43,8 @@ module.exports.run = async (message, args, gdb, { prefix, permissionLevel, conte
   }); else {
     searchQuery = searchQuery.toLowerCase();
     let commandFile = commands.find(({ command, aliases }) => searchQuery == command || aliases.includes(searchQuery));
-    if (!commandFile) commandFile = commands.find(({ description }) => description.toLowerCase().includes(searchQuery))
-    if (!commandFile) return message.channel.send("❌ No command was found with your search.")
+    if (!commandFile) commandFile = commands.find(({ description }) => description.toLowerCase().includes(searchQuery));
+    if (!commandFile) return message.channel.send("❌ No command was found with your search.");
 
     message.channel.send({
       embed: {
@@ -77,12 +77,12 @@ module.exports.run = async (message, args, gdb, { prefix, permissionLevel, conte
           }
         ].filter(f => f.value)
       }
-    })
+    });
   }
-}
+};
 
 // loading commands
-let commands = []
+let commands = [];
 for (const static of require("./_static.json")) commands.push({
   description: "Static command.",
   usage: {},
@@ -90,7 +90,7 @@ for (const static of require("./_static.json")) commands.push({
   aliases: static.triggers.slice(1), // all except the first trigger
   permissionRequired: 0,
   command: static.triggers[0] // the first trigger
-})
+});
 fs.readdir("./src/commands/", (err, files) => {
   if (err) return console.log(err);
   for (const file of files) if (file.endsWith(".js")) {
@@ -99,5 +99,5 @@ fs.readdir("./src/commands/", (err, files) => {
     commands.push(commandFile);
   }
   // sort the commands list by name once all commands have been loaded in
-  commands = commands.sort((a, b) => a.command.localeCompare(b.command))
-})
+  commands = commands.sort((a, b) => a.command.localeCompare(b.command));
+});
