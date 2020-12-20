@@ -5,7 +5,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "blapi": "^2.0.1",
     "bufferutil": "^4.0.1",
     "discord.js": "^12.3.1",
     "erlpack": "github:discord/erlpack",
