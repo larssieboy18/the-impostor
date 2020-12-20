@@ -71,7 +71,7 @@ module.exports = async guildid => {
       save(guildid, Object.keys(guildObject));
     }
   };
-}
+};
 
 module.exports.cacheAll = async (guilds = new Set()) => {
   let gdbs = await Guild.find({ $or: [...guilds].map(guildid => ({ guildid })) });

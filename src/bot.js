@@ -1,6 +1,5 @@
 const
   Discord = require("discord.js"),
-  BLAPI = require("blapi"),
   config = require("../config.json"),
   commandHandler = require("./handlers/commands.js"),
   hostingHandler = require("./handlers/hosting.js"),
