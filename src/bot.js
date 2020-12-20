@@ -59,7 +59,7 @@ client.once("shardReady", async (shardid, unavailable = new Set()) => {
 });
 
 function updatePresence() {
-  const n = Array.from(hostingHandler.gameStates.keys().filter(chid => client.channels.resolve(chid))).length;
+  const n = Array.from(hostingHandler.gameStates.keys()).filter(chid => client.channels.resolve(chid)).length;
   return client.user.setPresence({
     status: "online",
     activity: {
