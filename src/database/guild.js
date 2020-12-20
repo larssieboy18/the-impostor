@@ -10,30 +10,36 @@ const guildObject = {
   newGameVoiceChannel: "", // the "New Game"-voice channel
 };
 
-const guildSchema = mongoose.Schema(Object.assign({}, guildObject), { minimize: true }); // make a copy of guildObject
+const guildSchema = mongoose.Schema(JSON.parse(JSON.stringify(guildObject)), { minimize: true }); // make a copy of guildObject
 const Guild = mongoose.model("Guild", guildSchema);
 
 const get = (guildid) => new Promise((resolve, reject) => Guild.findOne({ guildid }, (err, guild) => {
   if (err) return reject(err);
   if (!guild) {
-    guild = new Guild(Object.assign({}, guildObject));
+    guild = new Guild(JSON.parse(JSON.stringify(guildObject)));
     guild.guildid = guildid;
   }
   return resolve(guild);
 }));
 
 const load = async (guildid) => {
-  let guild = await get(guildid), guildCache = {};
-  for (const key in guildObject) guildCache[key] = guild[key] || guildObject[key]; // if there's no value stored in the guild database then we use the default value
+  let guild = await get(guildid), guildCache = {}, freshGuildObject = JSON.parse(JSON.stringify(guildObject)); // make a fresh one, to not make duplicates across guilds (for example on arrays and objects)
+  for (const key in freshGuildObject) guildCache[key] = guild[key] || freshGuildObject[key]; // if there's no value stored in the guild database then we use the default value
   return dbCache.set(guildid, guildCache);
 };
 
 const save = async (guildid, changes) => {
   if (!dbSaveQueue.has(guildid)) {
     dbSaveQueue.set(guildid, changes);
-    let guild = await get(guildid), guildCache = dbCache.get(guildid), guildSaveQueue = dbSaveQueue.get(guildid);
+    let guild = await get(guildid), guildCache = dbCache.get(guildid), guildSaveQueue = JSON.parse(JSON.stringify(dbSaveQueue.get(guildid)));
     for (const key of guildSaveQueue) guild[key] = guildCache[key];
-    return guild.save().then(() => dbSaveQueue.delete(guildid)).catch(console.log);
+    return guild.save().then(() => {
+      let newSaveQueue = dbSaveQueue.get(guildid);
+      if (newSaveQueue.length > guildSaveQueue.length) {
+        dbSaveQueue.delete(guildid);
+        save(guildid, newSaveQueue.filter(key => !guildSaveQueue.includes(key)));
+      } else dbSaveQueue.delete(guildid);
+    }).catch(console.log);
   } else dbSaveQueue.get(guildid).push(...changes);
 };
 
@@ -53,15 +59,28 @@ module.exports = async guildid => {
     },
     setMultiple: (changes) => {
       let guildCache = dbCache.get(guildid);
-      for (const key in changes) guildCache[key] = changes[key];
+      Object.assign(guildCache, changes);
 
       save(guildid, Object.keys(changes));
     },
     reset: () => {
       let guildCache = dbCache.get(guildid);
-      for (const key in guildObject) guildCache[key] = guildObject[key];
+      Object.assign(guildCache, JSON.parse(JSON.stringify(guildObject)));
+      guildCache.guildid = guildid;
 
       save(guildid, Object.keys(guildObject));
     }
   };
+}
+
+module.exports.cacheAll = async (guilds = new Set()) => {
+  let gdbs = await Guild.find({ $or: [...guilds].map(guildid => ({ guildid })) });
+  return await Promise.all([...guilds].map(async guildid => {
+    let
+      guild = gdbs.find(db => db.guildid == guildid) || { guildid },
+      guildCache = {},
+      freshGuildObject = JSON.parse(JSON.stringify(guildObject)); // make a fresh one, to not make duplicates across guilds (for example on arrays and objects)
+    for (const key in freshGuildObject) guildCache[key] = guild[key] || freshGuildObject[key]; // if there's no value stored in the guild database then we use the default value
+    return dbCache.set(guildid, guildCache);
+  }));
 };
