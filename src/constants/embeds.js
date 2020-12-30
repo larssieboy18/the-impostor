@@ -18,15 +18,9 @@ module.exports.panelEmbeds = [
     color: 0xE74C3C
   },
   {
-    title: "Changelog October",
+    title: "Changelog December",
     description: [
-      "[•](https://github.com/biaw/the-impostor/issues?q=is%3Aissue+is%3Aclosed+-label%3Awontfix) Made a changelog that will reset monthly. (Yeah, you're looking at it!)",
-      "[•](https://github.com/biaw/the-impostor/issues/3) Introduced a new neat help command with detailed description of each command.",
-      "[•](https://github.com/biaw/the-impostor/issues/6) The bot will no longer randomly refresh the panel. It will now only refresh when starting the bot and when refreshing it manually.",
-      "[•](https://github.com/biaw/the-impostor/issues/7) Introduced a new toggle system. You now only have one button instead of two so you don't accidentally misclick.",
-      "[•](https://github.com/biaw/the-impostor/issues/8) The bot will now show how many games are being played with the bot in its presence.",
-      "[•](https://github.com/biaw/the-impostor/issues/15) When leaving a game VC, the bot will try and unmute/undeafen you. Also, when joining a game VC, the bot will treat you as a ghost and mute you if there's a discussion.",
-      "[•](https://github.com/biaw/the-impostor/issues/23) When the bot restarts, it will not auto-detect the hosting panel and not regenerate it."
+      "[•](https://github.com/biaw/the-impostor/commit/75e64c97440d6789367e0ae986fe31bbc5502e3d) Fixed a bug that have existed for a very very long time. The host can now actually control the game without moderation powers."
     ].join("\n\n"),
     color: 0x1ABC9C
   },
