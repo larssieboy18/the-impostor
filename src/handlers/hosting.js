@@ -11,19 +11,23 @@ module.exports.configure = (client, db) => { // on startup
 
     // create new rooms
     if (newVoice.channelID == newGameVoiceChannel) {
-      let channel = await newVoice.guild.channels.create(`${newVoice.member.displayName}'s Game`, {
-        type: "voice",
-        userLimit: 10,
-        parent: category,
-        permissionOverwrites: [
-          {
-            id: client.user.id, allow
-          }
-        ]
-      });
-      gameStates.set(channel.id, "game-over");
-      await newVoice.member.edit({ channel });
-      await channel.updateOverwrite(newVoice.member, { MUTE_MEMBERS: true, DEAFEN_MEMBERS: true });
+      let categoryChannel = newVoice.guild.channels.resolve(category);
+      if (categoryChannel) {
+        let channel = await newVoice.guild.channels.create(`${newVoice.member.displayName}'s Game`, {
+          type: "voice",
+          userLimit: 10,
+          parent: categoryChannel,
+          permissionOverwrites: [
+            ...(categoryChannel ? categoryChannel.permissionOverwrites.values() : []), // copy the category channel
+            {
+              id: client.user.id, allow
+            }
+          ]
+        });
+        gameStates.set(channel.id, "game-over");
+        await newVoice.member.edit({ channel });
+        await channel.updateOverwrite(newVoice.member, { MUTE_MEMBERS: true, DEAFEN_MEMBERS: true });
+      }
     }
 
     // delete empty rooms
