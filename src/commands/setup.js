@@ -7,7 +7,7 @@ module.exports = {
   checkArgs: (args) => !args.length
 };
 
-const { recreatePanel } = require("../handlers/hosting.js");
+const { recreatePanel } = require("../handlers/hosting.js"), { basePermissions: { allow } } = require("../constants/index.js")
 
 module.exports.run = async (message, args, gdb) => {
   const { hostingChannel, newGameVoiceChannel, category } = gdb.get();
@@ -26,26 +26,14 @@ module.exports.run = async (message, args, gdb) => {
 
   const m = await message.channel.send("♨️ Configuring the server, please wait... This should not take more than 15 seconds.");
 
-  const basePermissions = [
-    {
-      id: message.client.user.id,
-      allow: [
-        "VIEW_CHANNEL",
-        "SEND_MESSAGES",
-        "MANAGE_MESSAGES",
-        "ADD_REACTIONS",
-        "MANAGE_CHANNELS",
-        "MUTE_MEMBERS",
-        "DEAFEN_MEMBERS",
-        "MOVE_MEMBERS"
-      ]
-    }
-  ];
-
   // create the category
   const cChannel = await message.guild.channels.create("Among us", {
     type: "category",
-    permissionOverwrites: basePermissions
+    permissionOverwrites: [
+      {
+        id: message.client.user.id, allow
+      }
+    ]
   });
 
   // create hosting panel
@@ -57,7 +45,9 @@ module.exports.run = async (message, args, gdb) => {
     type: "voice",
     parent: cChannel,
     permissionOverwrites: [
-      ...basePermissions,
+      {
+        id: message.client.user.id, allow
+      },
       {
         id: message.guild.roles.everyone,
         deny: [

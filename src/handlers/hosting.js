@@ -1,6 +1,6 @@
 const actionPanels = new Map(), gameStates = new Map(), voiceResets = new Set(); // guild ID: action panel message ID
 
-const { panelEmbeds } = require("../constants/index.js");
+const { panelEmbeds, basePermissions: { allow } } = require("../constants/index.js");
 
 module.exports.configure = (client, db) => { // on startup
   client.on("voiceStateUpdate", async (oldVoice, newVoice) => {
@@ -15,7 +15,11 @@ module.exports.configure = (client, db) => { // on startup
         type: "voice",
         userLimit: 10,
         parent: category,
-        permissionOverwrites: []
+        permissionOverwrites: [
+          {
+            id: client.user.id, allow
+          }
+        ]
       });
       gameStates.set(channel.id, "game-over");
       await newVoice.member.edit({ channel });

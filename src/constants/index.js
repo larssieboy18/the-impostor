@@ -12,3 +12,17 @@ module.exports.getPermissionLevel = member => {
   if (member.hasPermission("MANAGE_MESSAGES")) return 1; // server mod
   return 0; // server member
 };
+
+module.exports.basePermissions = {
+  allow: [
+    "VIEW_CHANNEL",
+    "SEND_MESSAGES",
+    "MANAGE_MESSAGES",
+    "ADD_REACTIONS",
+    "MANAGE_CHANNELS",
+    "MANAGE_ROLES", // manage permissions
+    "MUTE_MEMBERS",
+    "DEAFEN_MEMBERS",
+    "MOVE_MEMBERS"
+  ]
+}
