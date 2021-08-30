@@ -99,7 +99,7 @@ module.exports.configure = (client, db) => { // on startup
         } else { // discussion or game-over; we want to deafen the alive ones and unmute the dead ones
           gameStates.set(vc.id, "in-game");
           let alive = vc.members.filter(member => !member.voice.serverMute), dead = vc.members.filter(member => member.voice.serverMute);
-          await Promise.all(alive.map(member => member.edit({ mute: false, deaf: true })));
+          await Promise.all(alive.map(member => member.edit({ mute: true, deaf: true })));
           await Promise.all(dead.map(member => member.edit({ mute: false, deaf: false })));
         }//🔰
       } else if (reaction.emoji.name == "♻️") {
